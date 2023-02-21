@@ -4,6 +4,8 @@ import catImg from '../../assets/images/bus.png';
 import talkImg from '../../assets/images/talk.png';
 import uiImage from "../../assets/images/UI.png"
 import photoImage from "../../assets/images/photo.png"
+import emptyImage from "../../assets/images/empty.png"
+import center2Img from "../../assets/images/center2.png"
 
 
 export default class LoadingScene extends Phaser.Scene{
@@ -18,6 +20,8 @@ export default class LoadingScene extends Phaser.Scene{
         this.load.image("background", bgImg);
         this.load.image("cat", catImg);
         this.load.image("talk", talkImg);
+        this.load.image("empty", emptyImage)
+        this.load.image("center2", center2Img)
     }
 
     create() {

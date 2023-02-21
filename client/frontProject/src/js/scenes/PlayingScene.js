@@ -18,11 +18,13 @@ export default class PlayingScene extends Phaser.Scene {
     preload(config)
     {
         this.load.html("please", "/assets/text/image.html")
+        this.load.html("signUp", "/assets/text/signUp.html")
         this.load.html("talkHtml", "/assets/text/talkHtml.html")
         this.load.html('nameform', '/assets/text/nameform.html')
         this.load.html('talkViewHtml', '/assets/text/talkViewHtml.html')
         this.load.html('photoPostHtml', '/assets/text/photoPost.html')
         this.load.html('photoGetHtml', '/assets/text/getPhoto.html')
+        this.load.html('buildingHtml', '/assets/text/building.html')
     }
     create(config) {
 
@@ -49,7 +51,7 @@ export default class PlayingScene extends Phaser.Scene {
         // sound
         this.sound.pauseOnBlur = false;
         // background
-        this.m_background = this.add.tileSprite(0, 0, Config.width, Config.height, "background");
+        this.m_background = this.add.tileSprite(0, 0, 1980, 4000, "background");
         this.m_background.setOrigin(0, 0);
         //minimap
 
@@ -69,7 +71,7 @@ export default class PlayingScene extends Phaser.Scene {
 
         this.m_canMove = true;
 
-        this.cameras.main.setBounds(0, 0, 1920, 1080);
+        this.cameras.main.setBounds(0, 0, 1920, 3000);
         //this.m_player.add(new Player(this));
         this.cameras.main.startFollow(this.m_player);
         //this.cameras.main.setSize(200,200);
@@ -140,7 +142,7 @@ export default class PlayingScene extends Phaser.Scene {
         //this.m_ui.setPosition(this.cameras.main.centerX,this.cameras.main.centerY+181)
 
 
-        this.m_structure = new Structure(this).setPosition(745, 455).setImmovable(true).setScale(2.7,3.8).setVisible(false).setOrigin(0, 0);
+        this.m_structure = new Structure(this).setPosition(745, 130).setImmovable(true).setScale(0.75,1).setVisible(true).setOrigin(0, 0);
         this.physics.add.collider(this.m_player, this.m_structure);
 
 
@@ -160,6 +162,20 @@ export default class PlayingScene extends Phaser.Scene {
             //console.log('erro', error);
         })
         ***/
+        this.buildingLayer = this.add.layer();
+        this.buildingLayer.add(this.m_structure)
+        this.markerLayer = this.add.layer();
+
+        this.playerLayer = this.add.layer();
+
+        this.uiLayer = this.add.layer();
+        this.m_ui.photoButton.setVisible(false)
+        this.m_ui.button.setVisible(false)
+        this.uiLayer.add(this.m_ui)
+        this.uiLayer.add(this.m_ui.talk)
+        this.uiLayer.add(this.m_ui.button)
+        this.uiLayer.add(this.m_ui.photoButton)
+        this.uiLayer.add(this.m_ui.photo)
     }
 
     viewTalk(t_text){
@@ -244,6 +260,9 @@ export default class PlayingScene extends Phaser.Scene {
                 }).catch(error => {
                     //console.log(post_token.text)
                 })
+            }
+            else if (event.target.name === 'closeButton'){
+                element.setVisible(false);
             }
         });
 
@@ -359,6 +378,7 @@ export default class PlayingScene extends Phaser.Scene {
         let login = this.m_login;
 
         let element = this.add.dom(350, 300).createFromCache('please').setOrigin(0);
+        let element2 = this.add.dom(350, 200).createFromCache('signUp').setOrigin(0).setVisible(false);
         this.m_token = this.add.text(-100, -100, 'Please login to play', {
             color: 'white',
             fontFamily: 'Arial',
@@ -407,6 +427,40 @@ export default class PlayingScene extends Phaser.Scene {
             }
             else if (event.target.id === 'forgot'){
                 element.setVisible(false);
+                ///
+                element2.setVisible(true)
+
+                element2.setPerspective(800);
+
+
+                element2.addListener('click');
+
+                element2.on('click', function (event) {
+                    if (event.target.name === 'signUpButton') {
+                        let inputUsername2 = this.getChildByName('username').value;
+                        let inputPassword2 = this.getChildByName('password').value;
+                        let inputName = this.getChildByName('name').value;
+                        let inputNickname = this.getChildByName('nickname').value;
+                        //console.log(inputUsername, inputPassword)
+                        axios.post('api/auth/signup', {
+                            "id" : inputUsername2,
+                            "name" : inputName,
+                            "nickname" : inputNickname,
+                            "password" : inputPassword2
+                        }, {
+                            withCredentials: true,
+                        }).then(res => {
+                            element2.setVisible(false);
+                            element.setVisible(true);
+                        }).catch(error => {
+                            //console.log(m_toekn.text())
+                        })
+                    }
+                    else if (event.target.id === 'forgot'){
+                        element2.setVisible(false);
+                        element.setVisible(true);
+                    }
+                });
             }
         });
         this.m_token.setText(m_token.text)
@@ -420,6 +474,10 @@ export default class PlayingScene extends Phaser.Scene {
         });
     }
 
+    signUp(){
+
+    }
+
     getNickname(){
         //console.log(this.m_token.text)
         axios('api/member/me' ,
@@ -429,6 +487,7 @@ export default class PlayingScene extends Phaser.Scene {
             }
             }).then(res => {
             this.m_player.name = JSON.parse(JSON.stringify(res.data)).nickname
+            this.m_player.nickname.setText(JSON.parse(JSON.stringify(res.data)).nickname)
             //console.log("success get nick " +this.m_player.name)
         }).catch(error => {
             //console.log('WTF', error);
@@ -489,7 +548,7 @@ export default class PlayingScene extends Phaser.Scene {
     }
 
     timerEvent(resources) {
-        if(this.counter%50 !== 0){
+        if(this.counter%5 !== 0){
             return
         }
         axios.defaults.withCredentials = true;
@@ -561,11 +620,22 @@ export default class PlayingScene extends Phaser.Scene {
             if(found === undefined){
                 var nP = new Player(this);
                 nP.setName(tmpName);
-                nP.setPosition(tmpX,tmpY)
+                nP.setPosition(tmpX,tmpY);
+                nP.nickname.setText(tmpName)
+                nP.nickname.setPosition(tmpX-10, tmpY-30)
+                this.playerLayer.add(nP);
                 this.playList.push(nP);
             }
             else{
-                found.setPosition(tmpX,tmpY);
+
+                if (found.getCenter().x !== tmpX || found.getCenter().y !== tmpY){
+                   // let target = new Phaser.Math.Vector2(tmpX,tmpY);
+                   // let target = new Phaser.Math.Vector2(tmpX,tmpY);
+                    //console.log(this.target.x, this.target.y)
+                    //this.physics.moveToObject(found, target, 200);
+                    //found.body.reset(tmpX, tmpY)
+                    found.setPosition(tmpX,tmpY)
+                }
             }
             /***
             if(!this.playList.){
@@ -602,6 +672,7 @@ export default class PlayingScene extends Phaser.Scene {
                         let newMarker = new Talk(this);
                         newMarker.setPosition(markerX, markerY)
                         newMarker.t_content.setText(markerId)
+                        this.markerLayer.add(newMarker)
                         this.talkList.push(newMarker)
                     }
                     else{
@@ -626,7 +697,29 @@ export default class PlayingScene extends Phaser.Scene {
         })
     }
 
+    viewBuilding(){
+        let element =  this.add.dom(1000, 700).createFromCache('buildingHtml').setScrollFactor(0);
+
+        element.setScale(0.6)
+        element.setPerspective(800);
+
+        element.addListener('click');
+
+        element.getChildByID('imageId').src = "/assets/images/center2.png"
+
+        console.log("asf!")
+
+        element.addListener('click');
+
+        element.on('click', function (event) {
+            if (event.target.name === 'closeButton') {
+                element.setVisible(false)
+            }
+        })
+    }
+
     update() {
+        this.m_player.nickname.setPosition(this.m_player.x-10, this.m_player.y-30)
         this.counter += 1
 
         //console.log(this.m_player.getCenter().x , this.m_player.getCenter().y)
@@ -635,11 +728,12 @@ export default class PlayingScene extends Phaser.Scene {
         if(this.m_canMove){
             this.handlePlayerMove();
         }
-        this.getMarker()
 
         if(this.m_id.text !== "noID" && this.getNicknameCount === 0){
             this.m_canMove = true;
            // //console.log(this.m_token.text)
+            this.m_ui.photoButton.setVisible(true)
+            this.m_ui.button.setVisible(true)
             this.getNickname(), {once: true}
             this.getNicknameCount +=1
         }
@@ -650,8 +744,10 @@ export default class PlayingScene extends Phaser.Scene {
             this.startPostPosition += 1
         }
 
-        if(this.startPostPosition !==0)
+        if(this.startPostPosition !==0) {
             this.timerEvent(this.resources)
+            this.getMarker()
+        }
 
 
         //this.m_ui.setPosition(this.cameras.main.centerX,this.cameras.main.centerY+181)

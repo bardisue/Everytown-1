@@ -13,9 +13,11 @@ export default class Player extends Phaser.Physics.Arcade.Image {
 
         this.canMove = true;
 
+        this.nickname = scene.add.text(0, 0, "default")
+
         scene.add.existing(this);
         scene.physics.add.existing(this);
-        this.setCollideWorldBounds(true);
+        //this.setCollideWorldBounds(true);
 
     }
 

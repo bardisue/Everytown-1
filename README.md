@@ -1,4 +1,4 @@
-![file](https://github.com/CNU-Software-Academy/Everytown/assets/64695312/cc5708d3-c98c-44e4-bdc6-4e296605d116)# Everytown
+# Everytown
 동계 1팀
 
 # 프로젝트 개요

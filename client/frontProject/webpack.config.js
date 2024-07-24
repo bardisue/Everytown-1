@@ -60,7 +60,8 @@ module.exports = {
     client: {
       overlay: true,
       webSocketURL: "ws://0.0.0.0:80/ws",
-    }
+    },
+    port: 5000,
   },
   plugins: [
     new CopyWebpackPlugin({

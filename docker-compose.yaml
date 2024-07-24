@@ -31,7 +31,7 @@ services:
     container_name: everytown
     restart: always
     expose:
-      - "5000"
+      - "8080"
     networks:
       - front-connection
   backend:

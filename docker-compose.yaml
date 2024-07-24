@@ -26,7 +26,7 @@ services:
       - imageserver
   everytown:
     build:
-      context: ./client
+      context: ./client/frontProject
       dockerfile: Dockerfile
     container_name: everytown
     restart: always

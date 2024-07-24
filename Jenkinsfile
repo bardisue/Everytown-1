@@ -9,10 +9,27 @@ pipeline {
                 git url: 'https://github.com/bardisue/Everytown-1.git', branch: 'main'
             }
         }
-        stage('Check Docker') {
+        stage('Prepare Nginx Config') {
             steps {
-                sh 'docker version'
-                sh 'docker-compose version'
+                sh '''
+                echo "server {
+                    listen 80;
+                    server_name localhost;
+                    location / {
+                        proxy_pass http://everytown:3000;
+                    }
+                }" > default.conf
+                chmod 644 default.conf
+                '''
+            }
+        }
+        stage('Debug Info') {
+            steps {
+                sh '''
+                pwd
+                ls -la
+                cat default.conf
+                '''
             }
         }
         stage('Build') {

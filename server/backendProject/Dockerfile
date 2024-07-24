@@ -1,6 +1,6 @@
 FROM openjdk:17
 
-COPY build/libs/everytown-0.0.1-SNAPSHOT.jar everytown.jar
+COPY everytown.jar everytown-0.0.1-SNAPSHOT.jar
 
 EXPOSE 7777
 

@@ -25,21 +25,25 @@ services:
       - backend
       - imageserver
   everytown:
-    image: everytown:1.3
+    build:
+      context: ./client
+      dockerfile: Dockerfile
     container_name: everytown
     restart: always
     expose:
-      - "8080"
+      - "5000"
     networks:
       - front-connection
   backend:
     networks:
       - front-connection
-    image: backend:0.3
+    build:
+      context: ./server/backendProject
+      dockerfile: Dockerfile
     container_name: backend
     restart: always
     ports:
-      - 7777:7777
+      - 8079:8079
     depends_on:
       - mysqldb
   mysqldb:
@@ -61,7 +65,9 @@ services:
     networks:
       - front-connection
   imageserver:
-    image: imageserver:0.2
+    build:
+      context: ./server/imageServer
+      dockerfile: Dockerfile
     container_name: imageserver
     restart: always
     expose:

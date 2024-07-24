@@ -9,18 +9,9 @@ pipeline {
                 git url: 'https://github.com/bardisue/Everytown-1.git', branch: 'main'
             }
         }
-        stage('Prepare Nginx Config') {
+        stage('Set File Permissions') {
             steps {
-                sh '''
-                echo "server {
-                    listen 80;
-                    server_name localhost;
-                    location / {
-                        proxy_pass http://everytown:3000;
-                    }
-                }" > default.conf
-                chmod 644 default.conf
-                '''
+                sh 'chmod 644 default.conf'
             }
         }
         stage('Debug Info') {
